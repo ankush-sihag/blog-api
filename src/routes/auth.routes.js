@@ -1,16 +1,25 @@
 const express = require('express');
 
+const {
+    registerUser,
+    loginUser
+} = require('../controllers/auth.controller');
+
+const { protect } = require('../middleware/auth.middleware');
+
 const router = express.Router();
-const asyncHandler = require('../middleware/async.middleware');
 
-router.get('/test', (req, res) => {
-    res.json({
+router.post('/register', registerUser);
+
+router.post('/login', loginUser);
+
+router.get('/me', protect, (req, res) => {
+
+    res.status(200).json({
         success: true,
-        message: 'Auth route working'
+        user: req.user
     });
+
 });
-
-
-
 
 module.exports = router;
