@@ -1,6 +1,7 @@
 const express = require('express');
 
 const router = express.Router();
+const asyncHandler = require('../middleware/async.middleware');
 
 router.get('/test', (req, res) => {
     res.json({
@@ -8,5 +9,8 @@ router.get('/test', (req, res) => {
         message: 'Auth route working'
     });
 });
+
+
+
 
 module.exports = router;
