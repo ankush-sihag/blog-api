@@ -2,7 +2,10 @@ const express = require('express');
 
 const {
     createPost,
-    getPosts
+    getPosts,
+    getPost,
+    updatePost,
+    deletePost
 } = require('../controllers/post.controller');
 
 const {
@@ -10,14 +13,19 @@ const {
 } = require('../middleware/auth.middleware');
 
 const {
-    createPostValidator
+    createPostValidator,
+    updatePostValidator
 } = require('../validators/post.validator');
 
-const validate = require('../validators/validationResult.validator');
+const validate = require(
+    '../validators/validationResult.validator'
+);
 
 const router = express.Router();
 
 router.get('/', getPosts);
+
+router.get('/:id', getPost);
 
 router.post(
     '/',
@@ -25,6 +33,20 @@ router.post(
     createPostValidator,
     validate,
     createPost
+);
+
+router.put(
+    '/:id',
+    protect,
+    updatePostValidator,
+    validate,
+    updatePost
+);
+
+router.delete(
+    '/:id',
+    protect,
+    deletePost
 );
 
 module.exports = router;

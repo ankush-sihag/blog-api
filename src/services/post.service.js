@@ -6,6 +6,23 @@ const createNewPost = async (data, userId) => {
 
     const slug = generateSlug(data.title);
 
+    const existingPosts = await postRepository.getAllPosts();
+
+    const slugExists = existingPosts.find(
+        (post) => post.slug === slug
+    );
+
+    if (slugExists) {
+
+        const error = new Error(
+            'Post with similar title already exists'
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+    }
+
     const post = await postRepository.createPost({
         ...data,
         slug,
@@ -38,30 +55,41 @@ const getSinglePost = async (postId) => {
     return post;
 };
 
-const updateSinglePost = async (postId, data) => {
+const updateSinglePost = async (
+    postId,
+    data
+) => {
+
+    const existingPost = await postRepository.getPostById(postId);
+
+    if (!existingPost) {
+
+        const error = new Error('Post not found');
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    if (data.title) {
+
+        data.slug = generateSlug(data.title);
+
+    }
 
     const updatedPost = await postRepository.updatePost(
         postId,
         data
     );
 
-    if (!updatedPost) {
-
-        const error = new Error('Post not found');
-
-        error.statusCode = 404;
-
-        throw error;
-    }
-
     return updatedPost;
 };
 
 const deleteSinglePost = async (postId) => {
 
-    const deletedPost = await postRepository.deletePost(postId);
+    const existingPost = await postRepository.getPostById(postId);
 
-    if (!deletedPost) {
+    if (!existingPost) {
 
         const error = new Error('Post not found');
 
@@ -70,7 +98,9 @@ const deleteSinglePost = async (postId) => {
         throw error;
     }
 
-    return deletedPost;
+    await postRepository.deletePost(postId);
+
+    return;
 };
 
 module.exports = {

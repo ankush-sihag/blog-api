@@ -21,11 +21,53 @@ const getPosts = asyncHandler(async (req, res) => {
 
     res.status(200).json({
         success: true,
+        count: posts.length,
         data: posts
+    });
+});
+
+const getPost = asyncHandler(async (req, res) => {
+
+    const post = await postService.getSinglePost(
+        req.params.id
+    );
+
+    res.status(200).json({
+        success: true,
+        data: post
+    });
+});
+
+const updatePost = asyncHandler(async (req, res) => {
+
+    const updatedPost =
+        await postService.updateSinglePost(
+            req.params.id,
+            req.body
+        );
+
+    res.status(200).json({
+        success: true,
+        data: updatedPost
+    });
+});
+
+const deletePost = asyncHandler(async (req, res) => {
+
+    await postService.deleteSinglePost(
+        req.params.id
+    );
+
+    res.status(200).json({
+        success: true,
+        message: 'Post deleted successfully'
     });
 });
 
 module.exports = {
     createPost,
-    getPosts
+    getPosts,
+    getPost,
+    updatePost,
+    deletePost
 };
