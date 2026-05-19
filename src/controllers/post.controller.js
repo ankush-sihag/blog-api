@@ -2,6 +2,8 @@ const asyncHandler = require('../middleware/async.middleware');
 
 const postService = require('../services/post.service');
 
+const ApiResponse = require('../utils/ApiResponse');
+
 const createPost = asyncHandler(async (req, res) => {
 
     const post = await postService.createNewPost(
@@ -9,10 +11,13 @@ const createPost = asyncHandler(async (req, res) => {
         req.user._id
     );
 
-    res.status(201).json({
-        success: true,
-        data: post
-    });
+    res.status(201).json(
+        new ApiResponse(
+            201,
+            'Post created successfully',
+            post
+        )
+    );
 });
 
 const getPosts = asyncHandler(async (req, res) => {
@@ -22,11 +27,16 @@ const getPosts = asyncHandler(async (req, res) => {
             req.query
         );
 
-    res.status(200).json({
-        success: true,
-        pagination: result.pagination,
-        data: result.posts
-    });
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            'posts fetched successfully',
+            {
+                pegination: result.pegination,
+                posts: result.posts
+            }
+        )
+    );
 });
 
 const getPost = asyncHandler(async (req, res) => {

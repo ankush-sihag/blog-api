@@ -2,6 +2,8 @@ const postRepository = require('../repositories/post.repository');
 
 const generateSlug = require('../utils/generateSlug');
 
+const ApiError = require('../utils/ApiError');
+
 const createNewPost = async (data, userId) => {
 
     const slug = generateSlug(data.title);
@@ -14,13 +16,7 @@ const createNewPost = async (data, userId) => {
 
     if (slugExists) {
 
-        const error = new Error(
-            'Post with similar title already exists'
-        );
-
-        error.statusCode = 400;
-
-        throw error;
+        throw new ApiError(404, 'Post not found');
     }
 
     const post = await postRepository.createPost({
@@ -79,11 +75,7 @@ const getSinglePost = async (postId) => {
 
     if (!post) {
 
-        const error = new Error('Post not found');
-
-        error.statusCode = 404;
-
-        throw error;
+        throw new ApiError(404, 'Post not found');
     }
 
     return post;
@@ -98,11 +90,7 @@ const updateSinglePost = async (
 
     if (!existingPost) {
 
-        const error = new Error('Post not found');
-
-        error.statusCode = 404;
-
-        throw error;
+        throw new ApiError(404, 'Post not found');
     }
 
     if (data.title) {
@@ -125,11 +113,7 @@ const deleteSinglePost = async (postId) => {
 
     if (!existingPost) {
 
-        const error = new Error('Post not found');
-
-        error.statusCode = 404;
-
-        throw error;
+        throw new ApiError(404, 'Post not found');
     }
 
     await postRepository.deletePost(postId);
