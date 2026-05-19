@@ -12,6 +12,8 @@ const {
     protect
 } = require('../middleware/auth.middleware');
 
+const checkPostOwnership = require('../middleware/postOwner.middleware');
+
 const {
     createPostValidator,
     updatePostValidator
@@ -20,6 +22,8 @@ const {
 const validate = require(
     '../validators/validationResult.validator'
 );
+
+
 
 const router = express.Router();
 
@@ -38,6 +42,7 @@ router.post(
 router.put(
     '/:id',
     protect,
+    checkPostOwnership,
     updatePostValidator,
     validate,
     updatePost
@@ -46,6 +51,7 @@ router.put(
 router.delete(
     '/:id',
     protect,
+    checkPostOwnership,
     deletePost
 );
 
