@@ -17,12 +17,15 @@ const createPost = asyncHandler(async (req, res) => {
 
 const getPosts = asyncHandler(async (req, res) => {
 
-    const posts = await postService.getAllPosts();
+    const result =
+        await postService.getAllPosts(
+            req.query
+        );
 
     res.status(200).json({
         success: true,
-        count: posts.length,
-        data: posts
+        pagination: result.pagination,
+        data: result.posts
     });
 });
 

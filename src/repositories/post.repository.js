@@ -4,10 +4,48 @@ const createPost = async (data) => {
     return Post.create(data);
 };
 
-const getAllPosts = async () => {
-    return Post.find()
+const getAllPosts = async ({
+    page,
+    limit,
+    search,
+    status,
+    sort
+}) => {
+
+    const query = {};
+
+    if (search) {
+
+        query.title = {
+            $regex: search,
+            $options: 'i'
+        };
+    }
+
+    if (status) {
+
+        query.status = status;
+    }
+
+    let sortOption = { createdAt: -1 };
+
+    if (sort === 'oldest') {
+
+        sortOption = { createdAt: 1 };
+    }
+
+    const posts = await Post.find(query)
         .populate('author', 'name email')
-        .sort({ createdAt: -1 });
+        .sort(sortOption)
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    const totalPosts = await Post.countDocuments(query);
+
+    return {
+        posts,
+        totalPosts
+    };
 };
 
 const getPostById = async (id) => {

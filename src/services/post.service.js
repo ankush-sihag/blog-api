@@ -32,11 +32,45 @@ const createNewPost = async (data, userId) => {
     return post;
 };
 
-const getAllPosts = async () => {
+const getAllPosts = async (queryParams) => {
 
-    const posts = await postRepository.getAllPosts();
+    const page =
+        Number(queryParams.page) || 1;
 
-    return posts;
+    const limit =
+        Number(queryParams.limit) || 10;
+
+    const search =
+        queryParams.search || '';
+
+    const status =
+        queryParams.status || '';
+
+    const sort =
+        queryParams.sort || 'latest';
+
+    const result =
+        await postRepository.getAllPosts({
+            page,
+            limit,
+            search,
+            status,
+            sort
+        });
+
+    const totalPages = Math.ceil(
+        result.totalPosts / limit
+    );
+
+    return {
+        posts: result.posts,
+        pagination: {
+            currentPage: page,
+            totalPages,
+            totalPosts: result.totalPosts,
+            limit
+        }
+    };
 };
 
 const getSinglePost = async (postId) => {
