@@ -16,9 +16,8 @@ const getAllPosts = async ({
 
     if (search) {
 
-        query.title = {
-            $regex: search,
-            $options: 'i'
+        query.$text = {
+            $search: search
         };
     }
 
