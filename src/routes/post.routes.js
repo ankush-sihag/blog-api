@@ -23,9 +23,14 @@ const validate = require(
     '../validators/validationResult.validator'
 );
 
-
+const commentRoutes = require('./comment.routes');
 
 const router = express.Router();
+
+router.use(
+    '/:postId/comments',
+    commentRoutes
+);
 
 router.get('/', getPosts);
 
