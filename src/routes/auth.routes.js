@@ -4,7 +4,8 @@ const {
     registerUser,
     loginUser,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    verifyEmail
 } = require('../controllers/auth.controller');
 
 const { protect } = require('../middleware/auth.middleware');
@@ -14,6 +15,13 @@ const { registerValidator, loginValidator, forgotPasswordValidator, resetPasswor
 const validate = require('../validators/validationResult.validator');
 
 const router = express.Router();
+
+router.get(
+    '/verify-email/:token',
+    verifyEmail
+);
+
+
 /**
  * @swagger
  * /auth/register:

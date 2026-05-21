@@ -15,8 +15,19 @@ const generateResetToken =
         '../utils/generateResetToken'
     );
 
+const generateVerificationToken =
+    require(
+        '../utils/generateVerificationToken'
+    );
+
+
+
 const ApiError = require(
     '../utils/ApiError'
+);
+
+const User = require(
+    '../models/User.model'
 );
 
 const {
@@ -42,6 +53,42 @@ const register = async (data) => {
         ...data,
         password: hashedPassword
     });
+
+    const verificationToken =
+        generateVerificationToken();
+
+    const hashedToken =
+        crypto
+            .createHash('sha256')
+            .update(verificationToken)
+            .digest('hex');
+
+    user.verificationToken =
+        hashedToken;
+
+    await user.save();
+
+    const verificationUrl =
+        `http://localhost:3000/verify-email/${verificationToken}`;
+
+
+        await sendEmail({
+
+            to: user.email,
+
+            subject:
+                'Verify Your Email',
+
+            html: `
+                <h2>Email Verification</h2>
+
+                <p>Click below link to verify your account:</p>
+
+                <a href="${verificationUrl}">
+                    Verify Email
+                </a>
+            `
+        });
 
     return user;
 };
@@ -69,6 +116,14 @@ const login = async (email, password) => {
         error.statusCode = 401;
 
         throw error;
+    }
+
+    if (!user.isVerified) {
+
+        throw new ApiError(
+            401,
+            'Please verify your email before login'
+        );
     }
 
     const token = jwt.sign(
@@ -149,10 +204,7 @@ const forgotPassword = async (
     return;
 };
 
-const resetPassword = async (
-    token,
-    password
-) => {
+const resetPassword = async (token, password) => {
 
     const hashedToken =
         crypto
@@ -193,10 +245,43 @@ const resetPassword = async (
     return;
 };
 
+const verifyEmail = async (token) => {
+
+    const hashedToken =
+        crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+    const user =
+        await User.findOne({
+
+            verificationToken:
+                hashedToken
+        });
+
+    if (!user) {
+
+        throw new ApiError(
+            400,
+            'Invalid verification token'
+        );
+    }
+
+    user.isVerified = true;
+
+    user.verificationToken =
+        undefined;
+
+    await user.save();
+
+    return;
+};
 
 module.exports = {
     register,
     login,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    verifyEmail
 };
