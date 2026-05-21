@@ -1,10 +1,9 @@
-const notFoundMiddleware = (req, res, next) => {
-    const error = new Error(
-        `Route not found - ${ req.originalUrl }`
-    );
+const ApiError = require('../utils/ApiError');
 
-    res.status(404);
-    next(error)
+const notFoundMiddleware = (req, res, next) => {
+    next(
+        new ApiError(404, `Route not found: ${req.originalUrl}`)
+    )
 };
 
 module.exports = notFoundMiddleware;

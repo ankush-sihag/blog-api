@@ -6,6 +6,10 @@ const ApiResponse = require('../utils/ApiResponse');
 
 const createPost = asyncHandler(async (req, res) => {
 
+    if (req.file) {
+        req.body.thumbnail = req.file
+    };
+
     const post = await postService.createNewPost(
         req.body,
         req.user._id
@@ -23,9 +27,7 @@ const createPost = asyncHandler(async (req, res) => {
 const getPosts = asyncHandler(async (req, res) => {
 
     const result =
-        await postService.getAllPosts(
-            req.query
-        );
+        await postService.getAllPosts({ ...req.query });
 
     res.status(200).json(
         new ApiResponse(

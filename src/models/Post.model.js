@@ -20,6 +20,11 @@ const postSchema = new mongoose.Schema(
             required: true
         },
 
+        thumbnail: {
+            type: String,
+            default: ''
+        },
+
         author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',

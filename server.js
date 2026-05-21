@@ -1,42 +1,44 @@
-// const express = require('express');
 const dotenv = require('dotenv');
-// const cors = require('cors');
-// const helmet = require('helmet');
+
 const connectDB = require('./src/config/database');
 
 dotenv.config();
-connectDB();
 
 const app = require('./src/app');
 
-// app.use(helmet());
+const logger = require('./src/config/logger');
 
-// app.use(cors());
-
-// app.use(express.json({ limit: '10kb' }));
-
-// app.get('/health', (req, res) => {
-//     res.status(200).json({ status: 'active', timestamp: new Date() });
-// });
-
-// app.use((err, req, res, next) => {
-//     const statusCode = err.statusCode || 500;
-//     res.status(statusCode).json({
-//         success: false,
-//         error: {
-//             message: err.message || 'Internal Server Error',
-//             status: statusCode,
-//             stack: process.env.NODE_ENV === 'development' ? err.stack: undefined
-//         }
-//     });
-// });
+process.on(
+    'uncaughtException', (error) => {
+        logger.error(
+            `UNCAUGHT EXCEPTION: ${ error.message }`
+        );
+        process.exit(1);
+    }
+);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server Running  on port ${PORT}`);
+connectDB();
+
+const server = app.listen(PORT, () => {
+    logger.info(`Server Running  on port ${PORT}`);
 });
 
-// process.on('unhandledRejection', (err) => {
-//     console.error(`[Unhandled Rejection] Error: ${err.message}`);
-//     server.close(() => process.exit(1));
-// });
+process.on(
+    'unhandledRejection', (error) => {
+        logger.error(
+            `UNHANDLED REJECTION: ${ error.message }`
+        );
+        server.close(() => {
+            process.exit(1);
+        });
+    }
+);
+
+process.on('SIGTERM', () => {
+    logger.info('SIGTERM recevied. shutting down gracefully');
+
+    server.close(() => {
+        logger.info('Process terminated.');
+    });
+});

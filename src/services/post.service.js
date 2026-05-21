@@ -4,6 +4,8 @@ const generateSlug = require('../utils/generateSlug');
 
 const ApiError = require('../utils/ApiError');
 
+const uploadToCloudinary = require('../utils/uploadToCloudinary');
+
 const createNewPost = async (data, userId) => {
 
     const slug = generateSlug(data.title);
@@ -19,8 +21,24 @@ const createNewPost = async (data, userId) => {
         throw new ApiError(404, 'Post not found');
     }
 
+    let thumbnailUrl = '';
+    if (data.thumbnail) {
+        const uploadedImage = 
+            await uploadToCloudinary(
+                data.thumbnail.buffer,
+                'blog-posts'
+            );
+
+            thumbnailUrl = uploadedImage.secure_url;
+    };
+
     const post = await postRepository.createPost({
-        ...data,
+        title: data.title,
+        content: data.content,
+        status: data.status,
+        category: data.category,
+        tags: data.tags,
+        thumbnail: thumbnailUrl,
         slug,
         author: userId
     });

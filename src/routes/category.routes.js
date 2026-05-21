@@ -30,6 +30,18 @@ const validate = require(
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /categories:
+ *   get:
+ *     summary: Get all categories
+ *     tags:
+ *       - Categories
+ *     responses:
+ *       200:
+ *         description: Categories fetched successfully
+ */
+
 router.get(
     '/',
     getCategories

@@ -25,6 +25,8 @@ const validate = require(
 
 const commentRoutes = require('./comment.routes');
 
+const upload = require('../middleware/upload.middleware');
+
 const router = express.Router();
 
 router.use(
@@ -32,13 +34,57 @@ router.use(
     commentRoutes
 );
 
+/**
+ * @swagger
+ * /posts:
+ *   get:
+ *     summary: Get all posts
+ *     tags:
+ *       - Posts
+ *     responses:
+ *       200:
+ *         description: Posts fetched successfully
+ */
+
 router.get('/', getPosts);
 
 router.get('/:id', getPost);
 
+/**
+ * @swagger
+ * /posts:
+ *   post:
+ *     summary: Create new post
+ *     tags:
+ *       - Posts
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - content
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               thumbnail:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: Post created successfully
+ */
+
 router.post(
     '/',
     protect,
+    upload.single('thumbnail'),
     createPostValidator,
     validate,
     createPost

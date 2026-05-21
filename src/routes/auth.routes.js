@@ -12,21 +12,65 @@ const { registerValidator, loginValidator } = require('../validators/auth.valida
 const validate = require('../validators/validationResult.validator');
 
 const router = express.Router();
-// console.log('1. registerValidator is:', typeof registerValidator);
-// console.log('2. validate is:', typeof validate);
-// console.log('3. registerUser is:', typeof registerUser);
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Register new user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ */
 
 router.post('/register', registerValidator, validate, registerUser);
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ */
+
 router.post('/login', loginValidator, validate, loginUser);
 
-// router.get('/me', protect, (req, res) => {
 
-//     res.status(200).json({
-//         success: true,
-//         user: req.user
-//     });
-
-// });
 
 module.exports = router;

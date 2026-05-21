@@ -36,6 +36,24 @@ const router = express.Router({
     mergeParams: true
 });
 
+/**
+ * @swagger
+ * /posts/{postId}/comments:
+ *   get:
+ *     summary: Get comments for a post
+ *     tags:
+ *       - Comments
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Comments fetched successfully
+ */
+
 router.get(
     '/',
     getComments
