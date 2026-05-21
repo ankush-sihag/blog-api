@@ -2,6 +2,23 @@ const bcrypt = require('bcryptjs');
 
 const jwt = require('jsonwebtoken');
 
+const crypto = require(
+    'crypto'
+);
+
+const sendEmail = require(
+    '../utils/sendEmail'
+);
+
+const generateResetToken =
+    require(
+        '../utils/generateResetToken'
+    );
+
+const ApiError = require(
+    '../utils/ApiError'
+);
+
 const {
     createUser,
     findUserByEmail
@@ -71,7 +88,115 @@ const login = async (email, password) => {
     };
 };
 
+const forgotPassword = async (
+    email
+) => {
+
+    const user =
+        await User.findOne({
+            email
+        });
+
+    if (!user) {
+
+        throw new ApiError(
+            404,
+            'User not found'
+        );
+    }
+
+    const resetToken =
+        generateResetToken();
+
+    const hashedToken =
+        crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+    user.resetPasswordToken =
+        hashedToken;
+
+    user.resetPasswordExpire =
+        Date.now() +
+        10 * 60 * 1000;
+
+    await user.save();
+
+    const resetUrl =
+        `http://localhost:3000/reset-password/${resetToken}`;
+
+    const html = `
+        <h2>Password Reset</h2>
+
+        <p>Click below link to reset your password:</p>
+
+        <a href="${resetUrl}">
+            Reset Password
+        </a>
+    `;
+
+    await sendEmail({
+
+        to: user.email,
+
+        subject:
+            'Password Reset Request',
+
+        html
+    });
+
+    return;
+};
+
+const resetPassword = async (
+    token,
+    password
+) => {
+
+    const hashedToken =
+        crypto
+            .createHash('sha256')
+            .update(token)
+            .digest('hex');
+
+    const user =
+        await User.findOne({
+
+            resetPasswordToken:
+                hashedToken,
+
+            resetPasswordExpire:
+                {
+                    $gt: Date.now()
+                }
+        });
+
+    if (!user) {
+
+        throw new ApiError(
+            400,
+            'Invalid or expired reset token'
+        );
+    }
+
+    user.password = password;
+
+    user.resetPasswordToken =
+        undefined;
+
+    user.resetPasswordExpire =
+        undefined;
+
+    await user.save();
+
+    return;
+};
+
+
 module.exports = {
     register,
-    login
+    login,
+    forgotPassword,
+    resetPassword
 };

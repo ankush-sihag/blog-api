@@ -2,12 +2,14 @@ const express = require('express');
 
 const {
     registerUser,
-    loginUser
+    loginUser,
+    forgotPassword,
+    resetPassword
 } = require('../controllers/auth.controller');
 
 const { protect } = require('../middleware/auth.middleware');
 
-const { registerValidator, loginValidator } = require('../validators/auth.validator');
+const { registerValidator, loginValidator, forgotPasswordValidator, resetPasswordValidator } = require('../validators/auth.validator');
 
 const validate = require('../validators/validationResult.validator');
 
@@ -71,6 +73,19 @@ router.post('/register', registerValidator, validate, registerUser);
 
 router.post('/login', loginValidator, validate, loginUser);
 
+router.post(
+    '/forgot-password',
+    forgotPasswordValidator,
+    validate,
+    forgotPassword
+);
+
+router.put(
+    '/reset-password/:token',
+    resetPasswordValidator,
+    validate,
+    resetPassword
+);
 
 
 module.exports = router;

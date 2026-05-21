@@ -27,7 +27,44 @@ const loginUser = asyncHandler(async (req, res) => {
     });
 });
 
+const forgotPassword =
+    asyncHandler(
+        async (req, res) => {
+
+            await authService.forgotPassword(
+                req.body.email
+            );
+
+            res.status(200).json(
+                new ApiResponse(
+                    200,
+                    'Password reset email sent'
+                )
+            );
+        }
+    );
+
+const resetPassword =
+    asyncHandler(
+        async (req, res) => {
+
+            await authService.resetPassword(
+                req.params.token,
+                req.body.password
+            );
+
+            res.status(200).json(
+                new ApiResponse(
+                    200,
+                    'Password reset successful'
+                )
+            );
+        }
+    );
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    forgotPassword,
+    resetPassword
 };
