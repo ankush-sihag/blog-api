@@ -65,6 +65,10 @@ const verifyEmailHandler =
     asyncHandler(
         async (req, res) => {
 
+            console.log("REQ PARAMS:", req.params);
+
+            console.log("TOKEN:", req.params.token);
+
             await verifyEmailService(
                 req.params.token
             );

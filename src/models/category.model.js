@@ -15,7 +15,7 @@ const categorySchema = new mongoose.Schema(
             trim: true
         },
         description: {
-            type: true,
+            type: String,
             default: ''
         }
     },

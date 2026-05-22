@@ -35,9 +35,18 @@ app.use(cookieParser());
 
 app.use(compression());
 
-app.get('/health', (req, res) => {
-    res.status(200).json({ sucess: true, message: 'server is healthy'});
+console.log("APP FILE UPDATED");
+
+app.use((req, res, next) => {
+    console.log('incoming url:', req.url);
+    next();
 });
+
+app.get('/health', (req, res) => {
+    console.log('Health route hit');
+    res.status(200).json({ success: true, message: 'server is healthy'});
+});
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

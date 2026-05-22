@@ -47,6 +47,8 @@ const register = async (data) => {
         throw error;
     }
 
+    
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     const user = await createUser({
@@ -56,6 +58,8 @@ const register = async (data) => {
 
     const verificationToken =
         generateVerificationToken();
+
+    console.log('Verification Token:',verificationToken);
 
     const hashedToken =
         crypto
@@ -96,6 +100,7 @@ const register = async (data) => {
 const login = async (email, password) => {
 
     const user = await findUserByEmail(email);
+    console.log(user);
 
     if (!user) {
         const error = new Error('Invalid credentials');
@@ -247,35 +252,32 @@ const resetPassword = async (token, password) => {
 
 const verifyEmail = async (token) => {
 
-    const hashedToken =
-        crypto
-            .createHash('sha256')
-            .update(token)
-            .digest('hex');
+   console.log("RAW TOKEN:", token);
 
-    const user =
-        await User.findOne({
+   const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
-            verificationToken:
-                hashedToken
-        });
+   console.log("HASHED TOKEN:", hashedToken);
 
-    if (!user) {
+   const user = await User.findOne({
+    verificationToken: hashedToken
+   });
 
-        throw new ApiError(
-            400,
-            'Invalid verification token'
-        );
-    }
+   console.log("FOUND USER:", user);
 
-    user.isVerified = true;
+   if (!user) {
+      throw new ApiError(400, "Invalid verification token");
+   }
 
-    user.verificationToken =
-        undefined;
+   user.isVerified = true;
 
-    await user.save();
+   user.verificationToken = undefined;
 
-    return;
+   await user.save();
+
+   return user;
 };
 
 module.exports = {

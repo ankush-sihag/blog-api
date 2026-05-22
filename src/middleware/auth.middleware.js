@@ -21,8 +21,11 @@ const protect = asyncHandler(async (req, res, next) => {
         token,
         process.env.JWT_SECRET
     );
+    console.log(decoded);
 
     const user = await User.findById(decoded.id).select('-password');
+
+    console.log(user);
 
     if (!user) {
         const error = new Error('User not found');
@@ -36,7 +39,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
 const authorize = (...roles) => {
     return (req, res, next) => {
-        if (!roles.includes(req.User.role)) {
+        if (!roles.includes(req.user.role)) {
             const error = new Error(
                 'Access Denied'
             );

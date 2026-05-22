@@ -34,7 +34,7 @@ const getPosts = asyncHandler(async (req, res) => {
             200,
             'posts fetched successfully',
             {
-                pegination: result.pegination,
+                pagination: result.pagination,
                 posts: result.posts
             }
         )
